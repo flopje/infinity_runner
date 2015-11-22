@@ -23,6 +23,8 @@ public class Main extends ApplicationAdapter {
     private AssetManager assetManager;
     private Array<ModelInstance> modelInstances = new Array<ModelInstance>();
 
+    private ModelInstance skyDome;
+
     private Boolean loading;
 	
 	@Override
@@ -38,6 +40,7 @@ public class Main extends ApplicationAdapter {
 
         assetManager = new AssetManager();
         assetManager.load("plane_box.g3db", Model.class);
+        assetManager.load("dome.g3db", Model.class);
 
         loading = true;
 	}
@@ -56,6 +59,9 @@ public class Main extends ApplicationAdapter {
 
         modelBatch.begin(camera);
         modelBatch.render(modelInstances, environment);
+        if (skyDome != null) {
+            modelBatch.render(skyDome);
+        }
         modelBatch.end();
 	}
 
@@ -78,7 +84,7 @@ public class Main extends ApplicationAdapter {
         camera.position.set(10f, 10f, 10f);
         camera.lookAt(0, 0, 0);
         camera.near = 1f;
-        camera.far = 300f;
+        camera.far = 500f;
         camera.update();
     }
 
@@ -95,8 +101,17 @@ public class Main extends ApplicationAdapter {
      */
     private void doneLoading() {
         Model plane = assetManager.get("plane_box.g3db", Model.class);
+
         ModelInstance modelInstance = new ModelInstance(plane);
         modelInstances.add(modelInstance);
+
+        ModelInstance modelInstance2 = new ModelInstance(plane);
+        modelInstance2.transform.setTranslation(0, 0, -30f);
+
+        modelInstances.add(modelInstance2);
+
+        skyDome =  new ModelInstance(assetManager.get("dome.g3db", Model.class));
+
         loading = false;
     }
 
