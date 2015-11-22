@@ -121,6 +121,9 @@ public class Main extends ApplicationAdapter {
         loading = false;
     }
 
+    /**
+     * Create a simple ground plane, covering the black void underneath the dome.
+     */
     private void createSimpleGroundPlane() {
         ModelBuilder builder = new ModelBuilder();
         Model model = builder.createBox(600f, 1f, 600f,
