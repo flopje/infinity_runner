@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 
 
@@ -28,6 +29,8 @@ public class Main extends ApplicationAdapter {
     private Array<ModelInstance> modelInstances = new Array<ModelInstance>();
 
     private ModelInstance skyDome;
+    private ModelInstance player;
+    private Vector3 playerCoords;
 
     private Boolean loading;
 	
@@ -35,6 +38,8 @@ public class Main extends ApplicationAdapter {
 	public void create () {
         environment = new Environment();
         modelBatch = new ModelBatch();
+
+        playerCoords  = new Vector3();
 
         setCamera();
         setupLights();
@@ -54,6 +59,14 @@ public class Main extends ApplicationAdapter {
 
         if (loading && assetManager.update()) {
             doneLoading();
+            playerCoords = player.transform.getTranslation(playerCoords);
+        }
+
+        if (!loading) {
+            updatePlayer();
+            playerCoords = player.transform.getTranslation(playerCoords);
+            camera.position.set(playerCoords.x, 10f, playerCoords.z+10f);
+            camera.update();
         }
 
         cameraInputController.update();
@@ -68,6 +81,10 @@ public class Main extends ApplicationAdapter {
         }
         modelBatch.end();
 	}
+
+    private void updatePlayer() {
+        player.transform.translate(1f, 0f,0f);
+    }
 
     @Override
     public void dispose() {
@@ -85,8 +102,8 @@ public class Main extends ApplicationAdapter {
      */
     private void setCamera() {
         camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        camera.position.set(10f, 10f, 10f);
-        camera.lookAt(0, 0, 0);
+        camera.position.set(20f, 10f, 0f);
+        camera.lookAt(playerCoords.x, 10f, playerCoords.z + 10f);
         camera.near = 1f;
         camera.far = 500f;
         camera.update();
@@ -118,6 +135,8 @@ public class Main extends ApplicationAdapter {
 
         createSimpleGroundPlane();
 
+        playerPlaceHolder();
+
         loading = false;
     }
 
@@ -131,6 +150,15 @@ public class Main extends ApplicationAdapter {
                 VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
         modelInstances.add(new ModelInstance(model));
 
+    }
+
+    private void playerPlaceHolder() {
+        ModelBuilder builder = new ModelBuilder();
+        Model model = builder.createBox(5, 18f, 3f,
+                new Material(ColorAttribute.createDiffuse(Color.BLUE)),
+                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
+        player = new ModelInstance(model);
+        modelInstances.add(player);
     }
 
 }
